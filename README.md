@@ -12,11 +12,14 @@ git clone https://github.com/FireFly177/recommendation_system_final.git
 cd recommendation_system_final
 ```
 
-Create and activate python virtual environment:
+Create python virtual environment:
 ```
-python -m venv .venv
-.\.venv\Scripts\activate   
+python -m venv .venv  
 ```
+
+Activate python virtual environment:
+On Windows: `.\.venv\Scripts\activate`
+On Linux/MacOS: `source .venv/Scripts/activate`
 
 To install the necessary dependencies, run:
 ```bash

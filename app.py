@@ -42,11 +42,21 @@ def recommend():
 
     # Get user ratings
     user_ratings = ratings[ratings['user_id'] == user_id][['user_id', 'movie_id', 'rating']]
-    user_ratings['prediction'] = user_ratings.apply(lambda x: predict_rating(user_id, x['movie_id']), axis=1)
+    user_ratings['prediction'] = batch_predict_ratings(user_id, user_ratings['movie_id'].values)
+
+    # Sort by actual rating in descending order
+    sorted_user_ratings = (
+        user_ratings.sort_values(by='rating', ascending=False)  # Sort by rating
+        .merge(movies, on='movie_id', how='inner', suffixes=['_u', '_m'])  # Add movie details
+    )
 
     # Filter recommendations for movies not rated by the user
-    recommendations = ratings[~ratings['movie_id'].isin(user_ratings['movie_id'])][['movie_id']].drop_duplicates()
-    recommendations['prediction'] = recommendations['movie_id'].apply(lambda movie_id: predict_rating(user_id, movie_id))
+    recommendations = ratings.loc[
+        ~ratings['movie_id'].isin(user_ratings['movie_id'])
+    ][['movie_id']].drop_duplicates()
+
+    # Predict ratings for recommendations
+    recommendations['prediction'] = batch_predict_ratings(user_id, recommendations['movie_id'].values)
 
     # Sort recommendations by prediction
     sorted_recommendations = (
@@ -55,8 +65,19 @@ def recommend():
         .head(50)
     )
 
-    return render_template('recommend.html', user_id=user_id, recommendations=sorted_recommendations)
+    # Render template with both tables
+    return render_template(
+        'recommend.html',
+        user_id=user_id,
+        user_ratings=sorted_user_ratings,
+        recommendations=sorted_recommendations
+    )
 
 
+# Batch prediction helper function
+def batch_predict_ratings(user_id, movie_ids):
+    user_ids = np.full_like(movie_ids, user_id - 1)  # Repeat user_id for the batch
+    movie_ids = movie_ids - 1  # Adjust for zero-based indexing
+    return trained_model.predict([user_ids, movie_ids], verbose=0).flatten()
 if __name__ == '__main__':
     app.run(debug=True)
