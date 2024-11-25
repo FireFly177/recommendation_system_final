@@ -18,6 +18,7 @@ python -m venv .venv
 ```
 
 Activate python virtual environment:
+
 On Windows: `.\.venv\Scripts\activate`
 On Linux/MacOS: `source .venv/Scripts/activate`
 
