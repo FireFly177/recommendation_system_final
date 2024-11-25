@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recommendations for User {{ user_id }}</title>
+</head>
+<body>
+    <h1>Recommendations for User {{ user_id }}</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Movie ID</th>
+                <th>Title</th>
+                <th>Genres</th>
+                <th>Predicted Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for recommendation in recommendations.itertuples() %}
+            <tr>
+                <td>{{ recommendation.movie_id }}</td>
+                <td>{{ recommendation.title }}</td>
+                <td>{{ recommendation.genres }}</td>
+                <td>{{ "%.2f" | format(recommendation.prediction) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="/">Back to Home</a>
+</body>
+</html>
